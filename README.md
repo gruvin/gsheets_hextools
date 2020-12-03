@@ -31,7 +31,9 @@ Used by `HEXBalance()`. You will need your own [Etherscan API Key](https://ether
 Used by `HEXUSD()`. You will need your own [Nomics API Key](https://p.nomics.com/cryptocurrency-bitcoin-api/).
 
 #### FloatRates.com
-Used by `CurrencyRate()`. Great site! You should [check them out](http://www.floatrates.com).
+Used by `CurrencyRate()`. 
+
+All great sites! You should total check them out, if you haven't already.
 
 ### How to Install
 
