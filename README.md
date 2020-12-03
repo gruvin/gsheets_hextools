@@ -37,7 +37,7 @@ Used by `CurrencyRate()`. Great site! You should [check them out](http://www.flo
 
 - Open your Google Sheets document. 
 - Select **Tools** / **Script Editor**. A new browser tab should open.
-- Copy the full `HEXTools` Google Docs script code from [here]() and paste it into your own script.
+- Copy the full `HEXTools` Google Docs script code from [here](https://github.com/gruvin/hextools_for_gsheets/blob/main/HEXTools.gs) and paste it into your own script.
 - Copy in your Etherscan and Nomics API keys, at the top of the script
 - Select **File** / **Save**
 - Return to you Google Sheet docs and reload the page.
