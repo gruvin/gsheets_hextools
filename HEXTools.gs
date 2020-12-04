@@ -59,11 +59,11 @@ function readRows() {
   var numRows = rows.getNumRows();
   var values = rows.getValues();
 
-/*  for (var i = 0; i <= numRows - 1; i++) {
+  for (var i = 0; i <= numRows - 1; i++) {
     var row = values[i];
     Logger.log(row);
   }
-*/
+
 }
 
 function onOpen() {
