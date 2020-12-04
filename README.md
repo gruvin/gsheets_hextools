@@ -54,8 +54,3 @@ gruvin
 
 ### No stake data?
 This would require a public Web API, tailored to making HEX ERC20 contract calls — or some kind of Web3 library, ported for use in Google Docs scripting (just javascript but too restricted?) If anyne know's a path to this then please make contact via my Github profile.
-
-### Excel?
-I looked into doing an Excel version of this but OMFG, what a mess! Far to much work and even then the user would have to learn too much, just to use it. Damnit Micros0ft, you aint never gonna change.
-
-
