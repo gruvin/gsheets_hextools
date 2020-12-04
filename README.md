@@ -52,4 +52,4 @@ Now you should be able to use the examples functions, as shown above. Good luck 
 
 gruvin
 
-P.S: I looked into doing an Excel version of this but OMFG, what a mess! Frankly, I'm not about to waste my time with all that nonsense. Sorry.
+P.S: I looked into doing an Excel version of this but OMFG, what a mess! Frankly, I'm not about to waste my time with all that nonsense.
