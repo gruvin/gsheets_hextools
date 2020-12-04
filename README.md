@@ -35,7 +35,7 @@ Used by `HEXUSD()`. You will need your own [Nomics API Key](https://p.nomics.com
 #### FloatRates.com
 Used by `CurrencyRate()`. 
 
-All great sites! You should total check them out, if you haven't already.
+All great sites! You should totally check them out, if you haven't already. ;-)
 
 ### How to Install
 
