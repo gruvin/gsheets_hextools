@@ -53,4 +53,4 @@ Now you should be able to use the examples functions, as shown above. Good luck 
 gruvin
 
 ### No stake data?
-This would require a public Web API, tailored to making HEX ERC20 contract calls — or some kind of Web3 library, ported for use in Google Docs scripting (just javascript but too restricted?) If anyne know's a path to this then please make contact via my Github profile.
+This would require a public Web API, tailored to making HEX ERC20 contract calls — or some kind of Web3 library, ported for use in Google Docs scripting (just javascript but too restricted?) If anyne knows a path to this, then please make contact via my Github profile.
