@@ -1,5 +1,7 @@
 const EtherscanAPIKey = "PASTE YOUR ETHERSCAN API KEY HERE"   // add an API Key at: https://etherscan.io/myapikey
-const NomicsAPIKey = "PASTE YOUR NOMICS API KEY HERE"         // get your key here: https://p.nomics.com/cryptocurrency-bitcoin-api/
+
+// no longer needed thanks to https://github.com/HexCommunity/HEX-APIs
+//const NomicsAPIKey = "PASTE YOUR NOMICS API KEY HERE"         // get your key here: https://p.nomics.com/cryptocurrency-bitcoin-api/
 
 // Please see README.md for more information
 
@@ -32,10 +34,20 @@ function CurrencyRate(fromString, toString) {
   return parseFloat(results[toString.toLowerCase()].rate)
 }
 
+/*
+// nomics.com
 function HEXUSD() {
   const results = NomicsRequest("currencies/ticker", {ids: "HEX"})
   return parseFloat(results[0].price)
 }
+*/
+
+// https://github.com/HexCommunity/HEX-APIs
+function HEXUSD() {
+  let results = fetchJSONObject("https://uniswapdataapi.azurewebsites.net/api/hexPrice")
+  return parseFloat(results.hexUsd)
+}  
+
 
 function HEXBalance(address) {
   const jsonObject = EtherscanRequest({
