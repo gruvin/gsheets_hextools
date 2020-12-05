@@ -29,8 +29,13 @@ Example: `=HEXBalance("0xF834b3E4040E13C5acd6a2Ed0D51592085863E7c")`
 #### Etherscan.org
 Used by `HEXBalance()`. You will need your own [Etherscan API Key](https://etherscan.io/myapikey).
 
-#### Nomics.com
-Used by `HEXUSD()`. You will need your own [Nomics API Key](https://p.nomics.com/cryptocurrency-bitcoin-api/).
+#### HexCommunity HEX-APIs by @firebun1337 (Github) 
+Used by `HEXUSD()`.
+
+See https://github.com/HexCommunity/HEX-APIs
+
+#### Nomics.com (deprecated)
+Was used by `HEXUSD()`. You [used to] need your own [Nomics API Key](https://p.nomics.com/cryptocurrency-bitcoin-api/).
 
 #### FloatRates.com
 Used by `CurrencyRate()`. 
