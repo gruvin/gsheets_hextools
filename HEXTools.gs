@@ -1,3 +1,4 @@
+// v0.1.2
 const EtherscanAPIKey = "PASTE YOUR ETHERSCAN API KEY HERE"   // add an API Key at: https://etherscan.io/myapikey
 
 // no longer needed thanks to https://github.com/HexCommunity/HEX-APIs
@@ -64,25 +65,17 @@ function HEXDAY() {
   return Math.floor((Date.now() - HEXLaunchDate) / (1000 * 3600 * 24))
 }
 
-// reading all cells forces a sheet wide recalc
-function readRows() {
-  var sheet = SpreadsheetApp.getActiveSheet();
-  var rows = sheet.getDataRange();
-  var numRows = rows.getNumRows();
-  var values = rows.getValues();
-
-  for (var i = 0; i <= numRows - 1; i++) {
-    var row = values[i];
-    Logger.log(row);
-  }
-
+function reCalc() {
+  var A1 = SpreadsheetApp.getActiveSheet().getRange("A1");
+  A1.setValue(A1.getValue()) // make a cahnge (not) so flush triggers
+  SpreadsheetApp.flush();
 }
 
 function onOpen() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet();
   var entries = [{
     name : "Update Data",
-    functionName : "readRows"
+    functionName : "reCalc"
   }];
   sheet.addMenu("HEX Tools", entries);
 };
