@@ -1,4 +1,4 @@
-// v0.1.2
+// v0.1.3
 const EtherscanAPIKey = "PASTE YOUR ETHERSCAN API KEY HERE"   // add an API Key at: https://etherscan.io/myapikey
 
 // no longer needed thanks to https://github.com/HexCommunity/HEX-APIs
@@ -20,7 +20,7 @@ function EtherscanRequest(paramsObject) {
   var url = "https://api.etherscan.io/api?tag=latest&apikey="+EtherscanAPIKey
   for (let param in paramsObject) url += "&"+param+"="+paramsObject[param]
   return fetchJSONObject(url)
-}  
+}
 
 function NomicsRequest(endpointString, paramsObject) {
   var url = "https://api.nomics.com/v1/"+endpointString+"?key="+NomicsAPIKey
@@ -35,13 +35,12 @@ function CurrencyRate(fromString, toString) {
   return parseFloat(results[toString.toLowerCase()].rate)
 }
 
-/*
 // nomics.com
-function HEXUSD() {
+function HEXUSD2() {
   const results = NomicsRequest("currencies/ticker", {ids: "HEX"})
   return parseFloat(results[0].price)
 }
-*/
+
 
 // https://github.com/HexCommunity/HEX-APIs
 function HEXUSD() {
@@ -60,22 +59,51 @@ function HEXBalance(address) {
   return (parseFloat(jsonObject.result)) / 1E8
 }
 
-function HEXDAY() {
+function HEXDay() {
   const HEXLaunchDate = new Date('2019-12-02T00:00:00Z')
   return Math.floor((Date.now() - HEXLaunchDate) / (1000 * 3600 * 24))
 }
 
-function reCalc() {
-  var A1 = SpreadsheetApp.getActiveSheet().getRange("A1");
-  A1.setValue(A1.getValue()) // make a cahnge (not) so flush triggers
+function refreshHEXFormulae() {
+  var activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet()
+  var sheet = activeSpreadsheet.getActiveSheet()
+  var range = sheet.getDataRange()
+  var numCols = range.getNumColumns()
+  var numRows = range.getNumRows()
+  var rowOffset = range.getRow()
+  var colOffset = range.getColumn()
+
+  // Change formulae to values, flush, then change them back ...
+  
+  //`row` and `col` are relative to the range, not the sheet
+  var formulae = range.getFormulas();
+  var hexFormulae = []
+  for (var row=0; row<numRows; row++) {
+    for (var col=0; col<numCols; col++) {
+      var f = formulae[row][col]
+      if(typeof f === "string" && f.match(/HEXUSD|HEXBalance|HEXDay/gi)) {
+        if (f.match(/HEXUSD|HEXBalance|HEXDay/gi)) { // Save time later by ignoring non-HEXTools formulae now
+          var r = row+rowOffset
+          var c = col+colOffset
+          var cell = range.getCell(r, c)
+          hexFormulae.push({ row: r, col: c, formula: f })
+          cell.setValue(cell.getValue())
+        }
+      }
+    }
+  } 
   SpreadsheetApp.flush();
+  hexFormulae.forEach((entry) => {
+    range.getCell(entry.row, entry.col).setFormula(entry.formula)
+  })
+  SpreadsheetApp.flush()  
 }
 
 function onOpen() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet();
   var entries = [{
-    name : "Update Data",
-    functionName : "reCalc"
+    name : "Refresh HEX Formulae",
+    functionName : "refreshHEXFormulae"
   }];
   sheet.addMenu("HEX Tools", entries);
 };
@@ -83,7 +111,7 @@ function onOpen() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function test() {
-  console.log(HEXDAY())
+  console.log(HEXDay())
   console.log(HEXUSD())
   console.log(CurrencyRate("NZD", "USD"))
   console.log(HEXBalance("0xF834b3E4040E13C5acd6a2Ed0D51592085863E7c"))
