@@ -1,4 +1,4 @@
-// v0.1.3
+// v0.1.4
 const EtherscanAPIKey = "PASTE YOUR ETHERSCAN API KEY HERE"   // add an API Key at: https://etherscan.io/myapikey
 
 // no longer needed thanks to https://github.com/HexCommunity/HEX-APIs
@@ -81,14 +81,13 @@ function refreshHEXFormulae() {
   for (var row=0; row<numRows; row++) {
     for (var col=0; col<numCols; col++) {
       var f = formulae[row][col]
-      if(typeof f === "string" && f.match(/HEXUSD|HEXBalance|HEXDay/gi)) {
-        if (f.match(/HEXUSD|HEXBalance|HEXDay/gi)) { // Save time later by ignoring non-HEXTools formulae now
-          var r = row+rowOffset
-          var c = col+colOffset
-          var cell = range.getCell(r, c)
-          hexFormulae.push({ row: r, col: c, formula: f })
-          cell.setValue(cell.getValue())
-        }
+      // ignore non-HEXTools formulae now, to save time later
+      if (typeof f === "string" && f.match(/HEXUSD\(|HEXBalance\(|HEXDay\(|CurrencyRate\(/gi)) {
+        var r = row+rowOffset
+        var c = col+colOffset
+        var cell = range.getCell(r, c)
+        hexFormulae.push({ row: r, col: c, formula: f })
+        cell.setValue(cell.getValue())
       }
     }
   } 
