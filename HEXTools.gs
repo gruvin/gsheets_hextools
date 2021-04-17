@@ -19,7 +19,14 @@ function fetchJSONObject(urlString) {
 function EtherscanRequest(paramsObject) {
   var url = "https://api.etherscan.io/api?tag=latest&apikey="+EtherscanAPIKey
   for (let param in paramsObject) url += "&"+param+"="+paramsObject[param]
-  return fetchJSONObject(url)
+  const r = fetchJSONObject(url)
+  if (r.error)
+    return { error: r.code, message: r.message }
+  else if (r.message && r.result && r.result === "NOT_OK") {
+    return { error: (-1), message: r.result }
+  } else {
+    return r
+  }
 }
 
 function NomicsRequest(endpointString, paramsObject) {
@@ -64,6 +71,23 @@ function HEXDay() {
   return Math.floor((Date.now() - HEXLaunchDate) / (1000 * 3600 * 24))
 }
 
+function ETHBalance(address) {
+  const jsonObject = EtherscanRequest({
+    module: "account",
+    action: "balance",
+    address: address
+  });
+  return (parseFloat(jsonObject.result)) / 1E18
+}
+
+function ETHPriceUSD() {
+  const jsonObject = EtherscanRequest({
+    module: "stats",
+    action: "ethprice"
+  });
+  return (parseFloat(jsonObject.result.ethusd))
+}
+
 function refreshHEXFormulae() {
   var activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet()
   var sheet = activeSpreadsheet.getActiveSheet()
@@ -98,6 +122,71 @@ function refreshHEXFormulae() {
   SpreadsheetApp.flush()  
 }
 
+function getContractABI(address) {
+  return EtherscanRequest({ 
+    module: "contract", 
+    to: HEX,
+    action: "getabi",
+    address: address
+  })
+}
+
+
+function contractCall(method, params) {
+  if (typeof params !== "object") return null
+  "&action=eth_call&to="+HEX+"&data="
+  let data="0x"+method
+  params.forEach(p => { data += p.toString().replace(/^0x/i, "").padStart(64, '0') })
+  const r = EtherscanRequest({ 
+    module: "proxy", 
+    to: HEX,
+    action: "eth_call",
+    data: data
+  })
+  if (r.error) return r
+  
+  return r.result.replace(/^0x/, '')
+}
+
+function stakeCount(address) {
+  const r = contractCall("33060d90", [address])
+  if (r.error) return r
+  return new BigNumber("0x"+r).toNumber()
+}
+  
+function stakeLists(address, index) {
+  const r = contractCall("2607443b", [ address, index ])
+  if (r.error) return r
+  
+  const f = r.match(/.{1,64}/g)
+  const seg1 = {
+    Id:          new BigNumber("0x"+f[0]).toString(),
+    principal:   new BigNumber("0x"+f[1]).div(1e8).toNumber(),
+    TShares:     new BigNumber("0x"+f[2]).div(1e12).toNumber(),
+    startDay:    new BigNumber("0x"+f[3]).toNumber(),
+    stakeDays:   new BigNumber("0x"+f[4]).toNumber(),
+  }
+  return { 
+    ...seg1, 
+    endDay: (seg1.startDay + seg1.stakeDays + 1),
+    unlockedDay: new BigNumber("0x"+f[4]).toNumber(),
+    isAutoStake: new BigNumber("0x"+f[5]).toNumber() === 1
+  }
+}
+
+function STAKELIST(address) {
+  const count = stakeCount(address)
+  if (count.error) return r
+
+  rows = []
+  for (i = 0; i < count; i++) {
+    const r = stakeLists(address, i);
+    if (r.error) return r
+    rows.push(r) 
+  }
+  return rows
+}
+    
 function onOpen() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet();
   var entries = [{
@@ -111,7 +200,17 @@ function onOpen() {
 
 function test() {
   console.log(HEXDay())
-  console.log(HEXUSD())
-  console.log(CurrencyRate("NZD", "USD"))
-  console.log(HEXBalance("0xF834b3E4040E13C5acd6a2Ed0D51592085863E7c"))
+  console.log("HEX-APIs: "+HEXUSD())
+  console.log("Nomics: "+HEXUSD2())
+  console.log(CurrencyRate("NZD", "USD").toFixed(3))
+  console.log("HEXBalance: "+HEXBalance("0xF834b3E4040E13C5acd6a2Ed0D51592085863E7c"))
+  console.log("ETHBalance: "+ETHBalance("0xF834b3E4040E13C5acd6a2Ed0D51592085863E7c"))
+  console.log("ETHPriceUSD: "+ETHPriceUSD())
+}
+
+function test2() {
+  const addr = "0xF834b3E4040E13C5acd6a2Ed0D51592085863E7c"
+  console.log(stakeCount(addr))
+  console.log(stakeLists(addr, 0))
+  console.log(STAKELIST(addr))
 }
