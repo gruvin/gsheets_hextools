@@ -10,6 +10,9 @@ const EtherscanAPIKey = "PASTE YOUR ETHERSCAN API KEY HERE"   // add an API Key 
 
 const HEX = "0x2b591e99afe9f32eaa6214f7b7629768c40eeb39"
 
+//import BigNumber from 'bignumber.mjs'
+
+
 function fetchJSONObject(urlString) {
   const jsondata = UrlFetchApp.fetch(urlString)
   return JSON.parse(jsondata.getContentText())
@@ -154,7 +157,7 @@ function stakeCount(address) {
   return new BigNumber("0x"+r).toNumber()
 }
   
-function stakeLists(address, index) {
+function getStake(address, index) {
   const r = contractCall("2607443b", [ address, index ])
   if (r.error) return r
   
@@ -174,19 +177,58 @@ function stakeLists(address, index) {
   }
 }
 
-function STAKELIST(address) {
+function _StakeList(address) {
   const count = stakeCount(address)
   if (count.error) return r
 
   rows = []
   for (i = 0; i < count; i++) {
-    const r = stakeLists(address, i);
+    const r = getStake(address, i);
     if (r.error) return r
     rows.push(r) 
   }
   return rows
 }
-    
+
+function StakeList(address, includeHeader /*true*/) {
+  if (typeof address === 'undefined') address = '0xD30542151ea34007c4c4ba9d653f4DC4707ad2d2'
+  if (typeof includeHeader === 'undefined') includeHeader = true
+  var activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet()
+  var sheet = activeSpreadsheet.getActiveSheet()
+  var range = sheet.getDataRange()
+  var numCols = range.getNumColumns()
+  var numRows = range.getNumRows()
+  var rowOffset = range.getRow()
+  var colOffset = range.getColumn()
+
+  var stakes = _StakeList(address)
+  var result = []
+  if (includeHeader) result.push([
+      'stake ID',
+      'principal',
+      'T-Shares',
+      'Start Day',
+      'End Day',
+      'Days',
+      'Auto-stake?'
+    ]
+  )
+
+  stakes.forEach(stakeData => {
+    var row = [
+      stakeData.Id, 
+      stakeData.principal,
+      stakeData.TShares,
+      stakeData.startDay,
+      stakeData.endDay,
+      stakeData.stakeDays,
+      stakeData.isAutoStake ? 'Yes' : 'No'
+    ]
+    result.push(row)
+  })
+  return result
+}
+
 function onOpen() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet();
   var entries = [{
@@ -211,6 +253,6 @@ function test() {
 function test2() {
   const addr = "0xF834b3E4040E13C5acd6a2Ed0D51592085863E7c"
   console.log(stakeCount(addr))
-  console.log(stakeLists(addr, 0))
-  console.log(STAKELIST(addr))
+  console.log(getStake(addr, 0))
+  console.log(StakeList(addr))
 }
